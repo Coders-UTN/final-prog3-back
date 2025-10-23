@@ -3,6 +3,7 @@
 # ###########################
 # Directorio de configuración del proyecto.
 .idea/
+.gradle/
 
 # Archivos de configuración de workspace (pueden ser específicos del usuario).
 workspace.xml
