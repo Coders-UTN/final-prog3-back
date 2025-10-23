@@ -4,7 +4,6 @@ package com.backend.finalprog3.spring.controller;
 import com.backend.finalprog3.spring.dto.AuthResponse;
 import com.backend.finalprog3.spring.dto.LoginRequestDTO;
 import com.backend.finalprog3.spring.dto.RegistroRequestDTO;
-import com.backend.finalprog3.spring.entity.Usuario;
 import com.backend.finalprog3.spring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
