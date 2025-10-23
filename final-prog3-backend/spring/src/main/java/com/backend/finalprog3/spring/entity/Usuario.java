@@ -1,12 +1,16 @@
 package com.backend.finalprog3.spring.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Entity
-@Table(name = "usuarios")
+@Builder
 public class Usuario {
 
     @Id
@@ -26,32 +30,13 @@ public class Usuario {
     private String celular;  // Cambié a String para formato internacional
 
     @Column(nullable = false)
-    private String password;
+    private String contrasena;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rol rol = Rol.USUARIO;  // Valor por defecto
 
-    // Campos de auditoría (opcionales pero recomendados)
-    @Column(name = "fecha_creacion")
-    private LocalDateTime fechaCreacion = LocalDateTime.now();
-
-    @Column(name = "fecha_actualizacion")
-    private LocalDateTime fechaActualizacion = LocalDateTime.now();
-
     @Column(nullable = false)
     private Boolean activo = true;
 
-    // Constructor por defecto
-    public Usuario() {}
-
-    // Constructor útil
-    public Usuario(String nombre, String apellido, String email, String password) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.email = email;
-        this.password = password;
-        this.rol = Rol.USUARIO;
-        this.activo = true;
-    }
 }
