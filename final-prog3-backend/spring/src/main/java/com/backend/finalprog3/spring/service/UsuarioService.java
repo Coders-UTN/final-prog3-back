@@ -4,5 +4,5 @@ import com.backend.finalprog3.spring.dto.RegistroRequestDTO;
 import com.backend.finalprog3.spring.dto.UsuarioDTO;
 
 public interface UsuarioService {
-    public UsuarioDTO crearUsuario(RegistroRequestDTO  registroRequestDTO);
+    UsuarioDTO crearUsuario(RegistroRequestDTO  registroRequestDTO);
 }
