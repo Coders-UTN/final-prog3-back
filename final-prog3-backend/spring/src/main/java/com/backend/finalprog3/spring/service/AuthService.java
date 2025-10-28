@@ -1,10 +1,12 @@
 package com.backend.finalprog3.spring.service;
 
-import com.backend.finalprog3.spring.dto.usuario.LoginRequestDTO;
-import com.backend.finalprog3.spring.dto.usuario.RegistroRequestDTO;
-import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
+import com.backend.finalprog3.spring.entity.Usuario;
+
+import java.util.Optional;
 
 public interface AuthService {
-    UsuarioDTO register(RegistroRequestDTO usuario);
-    UsuarioDTO login(LoginRequestDTO usuarioLogin);
+    Usuario register(Usuario usuario);
+    Usuario login(String email, String password);
+
+
 }

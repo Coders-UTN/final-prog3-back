@@ -1,9 +1,8 @@
 package com.backend.finalprog3.spring.controller;
 
 
-import com.backend.finalprog3.spring.dto.usuario.LoginRequestDTO;
-import com.backend.finalprog3.spring.dto.usuario.RegistroRequestDTO;
-import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
+import com.backend.finalprog3.spring.dto.LoginRequestDTO;
+import com.backend.finalprog3.spring.entity.Usuario;
 import com.backend.finalprog3.spring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,17 +19,40 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping("/register")
-    public ResponseEntity<UsuarioDTO> register(@RequestBody RegistroRequestDTO usuario) {
 
-        UsuarioDTO usuarioRegistrado = authService.register(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRegistrado);
+    //Post:
+
+    @PostMapping("/register")
+    public ResponseEntity<Usuario> register(@RequestBody Usuario usuario) {
+
+        Usuario usuarioRegistrado = authService.register(usuario);
+
+        //Se oculta contrasena respuesta (seguridad)
+
+        usuario.setPassword(null);
+
+        return ResponseEntity.status(201).body(usuarioRegistrado);
     }
+
+    //Logeo como usuario:
 
     @PostMapping("/login")
-    public ResponseEntity<UsuarioDTO> login(@RequestBody LoginRequestDTO loginRequest) {
-
-           UsuarioDTO loginEnUsuario = authService.login(loginRequest);
+    public ResponseEntity<Usuario> login(@RequestBody LoginRequestDTO loginRequest) {
+       try {
+           Usuario loginEnUsuario = authService.login(loginRequest.getEmail(), loginRequest.getPassword());
            return ResponseEntity.ok(loginEnUsuario);
+       }catch (RuntimeException e){
+           return ResponseEntity.status(401).build();
+       }
     }
+
+
+
+
+
+
+
+
+
+
 }
