@@ -1,9 +1,9 @@
 package com.backend.finalprog3.spring.controller;
 
 
-import com.backend.finalprog3.spring.dto.AuthResponse;
-import com.backend.finalprog3.spring.dto.LoginRequestDTO;
-import com.backend.finalprog3.spring.dto.RegistroRequestDTO;
+import com.backend.finalprog3.spring.dto.usuario.LoginRequestDTO;
+import com.backend.finalprog3.spring.dto.usuario.RegistroRequestDTO;
+import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
 import com.backend.finalprog3.spring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,16 +21,16 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegistroRequestDTO usuario) {
+    public ResponseEntity<UsuarioDTO> register(@RequestBody RegistroRequestDTO usuario) {
 
-            AuthResponse authResponse = authService.register(usuario);
-            return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
+        UsuarioDTO usuarioRegistrado = authService.register(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRegistrado);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequestDTO loginRequest) {
-           AuthResponse loginEnUsuario = authService.login(loginRequest);
-           return ResponseEntity.ok(loginEnUsuario);
+    public ResponseEntity<UsuarioDTO> login(@RequestBody LoginRequestDTO loginRequest) {
 
+           UsuarioDTO loginEnUsuario = authService.login(loginRequest);
+           return ResponseEntity.ok(loginEnUsuario);
     }
 }
