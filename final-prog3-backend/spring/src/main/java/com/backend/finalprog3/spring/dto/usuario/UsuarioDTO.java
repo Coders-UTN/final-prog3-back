@@ -1,4 +1,4 @@
-package com.backend.finalprog3.spring.dto;
+package com.backend.finalprog3.spring.dto.usuario;
 
 import com.backend.finalprog3.spring.entity.Rol;
 
