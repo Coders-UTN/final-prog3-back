@@ -1,12 +1,10 @@
 package com.backend.finalprog3.spring.service;
 
-import com.backend.finalprog3.spring.dto.AuthResponse;
-import com.backend.finalprog3.spring.dto.LoginRequestDTO;
-import com.backend.finalprog3.spring.dto.RegistroRequestDTO;
+import com.backend.finalprog3.spring.dto.usuario.LoginRequestDTO;
+import com.backend.finalprog3.spring.dto.usuario.RegistroRequestDTO;
+import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
 
 public interface AuthService {
-    AuthResponse register(RegistroRequestDTO usuario);
-    AuthResponse login(LoginRequestDTO usuarioLogin);
-
-
+    UsuarioDTO register(RegistroRequestDTO usuario);
+    UsuarioDTO login(LoginRequestDTO usuarioLogin);
 }

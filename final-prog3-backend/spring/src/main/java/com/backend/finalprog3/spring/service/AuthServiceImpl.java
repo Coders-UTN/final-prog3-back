@@ -1,9 +1,8 @@
 package com.backend.finalprog3.spring.service;
 
-import com.backend.finalprog3.spring.dto.AuthResponse;
-import com.backend.finalprog3.spring.dto.LoginRequestDTO;
-import com.backend.finalprog3.spring.dto.RegistroRequestDTO;
-import com.backend.finalprog3.spring.dto.UsuarioDTO;
+import com.backend.finalprog3.spring.dto.usuario.LoginRequestDTO;
+import com.backend.finalprog3.spring.dto.usuario.RegistroRequestDTO;
+import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
 import com.backend.finalprog3.spring.entity.Usuario;
 import com.backend.finalprog3.spring.mapper.UsuarioMapper;
 import com.backend.finalprog3.spring.repository.UsuarioRepository;
@@ -23,18 +22,13 @@ public class AuthServiceImpl implements AuthService {
     private UsuarioService usuarioService;
 
     @Override
-    public AuthResponse register(RegistroRequestDTO usuarioRegistro) {
+    public UsuarioDTO register(RegistroRequestDTO usuarioRegistro) {
 
-        UsuarioDTO usuarioCreado = usuarioService.crearUsuario(usuarioRegistro);
-
-        //Creacion de token de autenticacion
-        String token = "token_simulado_aqui";
-
-        return new AuthResponse(token, usuarioCreado);
+        return usuarioService.crearUsuario(usuarioRegistro);
     }
 
     @Override
-    public AuthResponse login(LoginRequestDTO usuarioLogin) {
+    public UsuarioDTO login(LoginRequestDTO usuarioLogin) {
 
         Usuario usuario = usuarioRepository.findByEmail(usuarioLogin.email()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email invalido"));
@@ -45,8 +39,7 @@ public class AuthServiceImpl implements AuthService {
         if(!usuario.getContrasena().equals(contrasenaHasheada)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Contraseña incorrecta");
         }
-        String token =  "token_simulado_aqui";
 
-        return new AuthResponse(token, usuarioMapper.toDto(usuario));
+        return usuarioMapper.toDto(usuario);
     }
 }
