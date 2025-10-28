@@ -6,10 +6,14 @@ import com.backend.finalprog3.spring.dto.producto.ProductoDTO;
 import java.util.List;
 
 public interface ProductoService {
-    void crearProducto(CreateProductoDTO producto);
+
+    ProductoDTO crearProducto(CreateProductoDTO createProductoDTO);
     List<ProductoDTO> findAllProductos();
-    ProductoDTO  findProductoById(Integer id);
+    ProductoDTO findProductoById(Long id);
     ProductoDTO findProductoByName(String name);
-    ProductoDTO modificarProducto(ProductoDTO productoDTO);
-    void eliminarProducto(Integer id);
+    ProductoDTO modificarProducto(Long id, CreateProductoDTO updateDTO);
+
+    void eliminarProducto(Long id);
+
+
 }

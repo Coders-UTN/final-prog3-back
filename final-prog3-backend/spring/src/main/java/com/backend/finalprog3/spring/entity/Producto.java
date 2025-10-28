@@ -18,7 +18,7 @@ public class Producto {
     double precio;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoria_id")
+    @JoinColumn(name = "categoria_id",nullable = false)
     @JsonBackReference
     Categoria categoria;
 

@@ -4,6 +4,7 @@ public record CategoriaDTO(
         Long id,
         String nombre,
         String descripcion,
-        String imagen
+        String imagen,
+        boolean activo
 ) {
 }

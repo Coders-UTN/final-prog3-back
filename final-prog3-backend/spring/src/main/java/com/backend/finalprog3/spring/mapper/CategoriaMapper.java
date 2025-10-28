@@ -12,7 +12,8 @@ public class CategoriaMapper {
                 categoria.getId(),
                 categoria.getNombre(),
                 categoria.getDescripcion(),
-                categoria.getImagen()
+                categoria.getImagen(),
+                categoria.getActivo()
         );
     }
 

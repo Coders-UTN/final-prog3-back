@@ -14,12 +14,15 @@ import org.springframework.web.server.ResponseStatusException;
 public class ProductoMapper {
 
     public ProductoDTO toDTO(Producto producto) {
+        String nombreCategoria = (producto.getCategoria() != null)
+                ? producto.getCategoria().getNombre()
+                : null;
+
         return new ProductoDTO(
                 producto.getId(),
                 producto.getNombre(),
                 producto.getPrecio(),
-                // Verificación segura
-                producto.getCategoria() != null ? producto.getCategoria().getNombre() : null
+                nombreCategoria
         );
     }
 
