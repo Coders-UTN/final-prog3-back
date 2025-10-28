@@ -1,7 +1,7 @@
 package com.backend.finalprog3.spring.service;
 
-import com.backend.finalprog3.spring.dto.RegistroRequestDTO;
-import com.backend.finalprog3.spring.dto.UsuarioDTO;
+import com.backend.finalprog3.spring.dto.usuario.RegistroRequestDTO;
+import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
 import com.backend.finalprog3.spring.entity.Rol;
 import com.backend.finalprog3.spring.entity.Usuario;
 import com.backend.finalprog3.spring.mapper.UsuarioMapper;
