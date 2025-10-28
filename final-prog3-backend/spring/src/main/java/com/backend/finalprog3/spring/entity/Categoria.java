@@ -19,17 +19,20 @@ public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(nullable = false, length = 50, unique = true)
-    String nombre;
+    private String nombre;
 
     @OneToMany(mappedBy = "categoria",
     fetch =FetchType.LAZY,
     cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonManagedReference
     @Builder.Default
-    List<Producto> producto = new ArrayList<>();
+    private List<Producto> producto = new ArrayList<>();
+
+    private String descripcion;
+    private String imagen;
 
 
     public void agregarProducto(Producto producto){

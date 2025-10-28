@@ -10,13 +10,17 @@ public class CategoriaMapper {
     public CategoriaDTO toDto(Categoria categoria) {
         return new CategoriaDTO(
                 categoria.getId(),
-                categoria.getNombre()
+                categoria.getNombre(),
+                categoria.getDescripcion(),
+                categoria.getImagen()
         );
     }
 
     public Categoria toEntity(CreateCategoriaDTO categoriaDTO) {
         return Categoria.builder()
                 .nombre(categoriaDTO.nombre())
+                .descripcion(categoriaDTO.descripcion())
+                .imagen(categoriaDTO.imagen())
                 .build();
     }
 }
