@@ -32,10 +32,11 @@ public class CategoriaController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaDTO> crearCategoria(@RequestBody CreateCategoriaDTO categoria){
+    public ResponseEntity<Void> crearCategoria(@RequestBody CreateCategoriaDTO categoria){
 
-        CategoriaDTO nuevaCategoria = categoriaService.crearCategoria(categoria);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCategoria);
+        categoriaService.crearCategoria(categoria);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/nombre/{nombre}")
