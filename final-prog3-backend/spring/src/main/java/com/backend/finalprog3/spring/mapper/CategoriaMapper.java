@@ -8,12 +8,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class CategoriaMapper {
     public CategoriaDTO toDto(Categoria categoria) {
+
+        Boolean activoSeguro = categoria.getActivo() != null ? categoria.getActivo() : false;
+
+
         return new CategoriaDTO(
                 categoria.getId(),
                 categoria.getNombre(),
                 categoria.getDescripcion(),
                 categoria.getImagen(),
-                categoria.getActivo()
+                activoSeguro
         );
     }
 
