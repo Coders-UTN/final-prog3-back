@@ -18,7 +18,9 @@ public class ProductoMapper {
                 producto.getNombre(),
                 producto.getPrecio(),
                 nombreCategoria,
-                producto.getStock()
+                producto.getStock(),
+                producto.getDescripcion(),
+                producto.getImagen()
         );
     }
 
@@ -27,6 +29,8 @@ public class ProductoMapper {
                 .nombre(dto.nombre())
                 .precio(dto.precio())
                 .stock(dto.stock())
+                .descripcion(dto.descripcion())
+                .imagen(dto.imagen())
                 .build();
         return nuevoProducto;
     }
