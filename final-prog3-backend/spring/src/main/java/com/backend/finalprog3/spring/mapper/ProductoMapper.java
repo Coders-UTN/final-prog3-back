@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 public class ProductoMapper {
 
     public ProductoDTO toDTO(Producto producto) {
-        String nombreCategoria = (producto.getCategoria() != null)
-                ? producto.getCategoria().getNombre()
+        Long categoriaId = (producto.getCategoria() != null)
+                ? producto.getCategoria().getId()
                 : null;
 
         return new ProductoDTO(
                 producto.getId(),
                 producto.getNombre(),
                 producto.getPrecio(),
-                nombreCategoria,
+                categoriaId,
                 producto.getStock(),
                 producto.getDescripcion(),
                 producto.getImagen()
