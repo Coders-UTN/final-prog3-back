@@ -9,4 +9,3 @@ public record CreateProductoDTO(
         String imagen
 ) {
 }
-
