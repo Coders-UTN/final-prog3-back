@@ -4,6 +4,9 @@ public record CreateProductoDTO(
         String nombre,
         double precio,
         Long categoriaid,
-        int stock
+        int stock,
+        String descripcion,
+        String imagen
 ) {
 }
+

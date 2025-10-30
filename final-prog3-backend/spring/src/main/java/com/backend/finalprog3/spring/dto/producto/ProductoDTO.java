@@ -4,7 +4,9 @@ public record ProductoDTO(
         Long id,
         String nombre,
         double precio,
-        String categoria,
-        int stock
+        Long categoriaid,
+        int stock,
+        String descripcion,
+        String imagen
 ) {
 }

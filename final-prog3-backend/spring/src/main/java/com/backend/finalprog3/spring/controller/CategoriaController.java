@@ -1,7 +1,7 @@
 package com.backend.finalprog3.spring.controller;
 
-import com.backend.finalprog3.spring.dto.categoria.CategoriaDTO;
 import com.backend.finalprog3.spring.dto.categoria.CreateCategoriaDTO;
+import com.backend.finalprog3.spring.dto.categoria.CategoriaDTO;
 import com.backend.finalprog3.spring.service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,51 +12,46 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categorias")
+@CrossOrigin(origins = "http://localhost:5173")
 public class CategoriaController {
 
-    @Autowired
-    private CategoriaService categoriaService;
+    @Autowired private CategoriaService categoriaService;
+
+    @PostMapping
+    public ResponseEntity<CategoriaDTO> crearCategoria(@RequestBody CreateCategoriaDTO createDTO) {
+        CategoriaDTO nuevaCategoria = categoriaService.crearCategoria(createDTO);
+        return new ResponseEntity<>(nuevaCategoria, HttpStatus.CREATED);
+    }
 
     @GetMapping
-    public ResponseEntity<List<CategoriaDTO>> getAll(){
-
-        List<CategoriaDTO> listaCategorias = categoriaService.listarCategorias();
-        return ResponseEntity.ok(listaCategorias);
+    public List<CategoriaDTO> findAllCategorias() {
+        return categoriaService.findAllCategorias();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriaDTO> getById(@PathVariable Long id){ // <-- CORREGIDO
-
-        CategoriaDTO categoria = categoriaService.findById(id);
-        return ResponseEntity.ok(categoria);
+    public ResponseEntity<CategoriaDTO> findCategoriaById(@PathVariable Long id) {
+        CategoriaDTO categoriaDTO = categoriaService.findCategoriaById(id);
+        return ResponseEntity.ok(categoriaDTO);
     }
 
-    @PostMapping
-    public ResponseEntity<Void> crearCategoria(@RequestBody CreateCategoriaDTO categoria){
-
-        categoriaService.crearCategoria(categoria);
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @GetMapping("/nombre/{nombre}")
-    public ResponseEntity<CategoriaDTO> getByNombre(@PathVariable String nombre){
-
-        CategoriaDTO categoriaEncontrada = categoriaService.findByNombreIgnoreCase(nombre);
-        return ResponseEntity.ok(categoriaEncontrada);
+    @GetMapping("/nombre/{name}")
+    public ResponseEntity<CategoriaDTO> findCategoriaByName(@PathVariable String name) {
+        CategoriaDTO categoriaDTO = categoriaService.findByNombreIgnoreCase(name);
+        return ResponseEntity.ok(categoriaDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoriaDTO> modificarCategoria(@PathVariable Long id, @RequestBody CreateCategoriaDTO categoria){
+    public ResponseEntity<CategoriaDTO> modificarCategoria(
+            @PathVariable Long id,
+            @RequestBody CreateCategoriaDTO updateDTO) {
 
-        CategoriaDTO categoriaEditada = categoriaService.modificarCategoria(id, categoria);
-        return ResponseEntity.ok(categoriaEditada);
+        CategoriaDTO categoriaActualizada = categoriaService.modificarCategoria(id, updateDTO);
+        return ResponseEntity.ok(categoriaActualizada);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarCategoria(@PathVariable Long id){
+    public ResponseEntity<Void> eliminarCategoria(@PathVariable Long id) {
         categoriaService.eliminarCategoria(id);
-        return ResponseEntity.ok("Categoria eliminada correctamente");
+        return ResponseEntity.noContent().build();
     }
 }
-

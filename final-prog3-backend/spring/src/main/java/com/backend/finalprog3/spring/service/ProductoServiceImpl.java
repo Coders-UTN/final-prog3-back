@@ -67,6 +67,8 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setNombre(updateDTO.nombre());
         producto.setPrecio(updateDTO.precio());
         producto.setStock(updateDTO.stock());
+        producto.setDescripcion(updateDTO.descripcion());
+        producto.setImagen(updateDTO.imagen());
 
         if (updateDTO.categoriaid() != null && !updateDTO.categoriaid().equals(producto.getCategoria().getId())) {
             Categoria nuevaCategoria = categoriaRepository.findById(updateDTO.categoriaid())
