@@ -32,7 +32,6 @@ public class Categoria {
     @Builder.Default
     private List<Producto> producto = new ArrayList<>();
 
-    @Lob
     private String descripcion;
     private String imagen;
 
