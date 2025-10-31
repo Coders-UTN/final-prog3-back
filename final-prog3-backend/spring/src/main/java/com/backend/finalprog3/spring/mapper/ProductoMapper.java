@@ -2,6 +2,7 @@ package com.backend.finalprog3.spring.mapper;
 
 import com.backend.finalprog3.spring.dto.producto.CreateProductoDTO;
 import com.backend.finalprog3.spring.dto.producto.ProductoDTO;
+import com.backend.finalprog3.spring.entity.Categoria;
 import com.backend.finalprog3.spring.entity.Producto;
 import org.springframework.stereotype.Component;
 
@@ -9,15 +10,17 @@ import org.springframework.stereotype.Component;
 public class ProductoMapper {
 
     public ProductoDTO toDTO(Producto producto) {
-        Long categoriaId = (producto.getCategoria() != null)
-                ? producto.getCategoria().getId()
-                : null;
+        Categoria categoria = producto.getCategoria();
+
+        Long categoriaId = (categoria != null) ? categoria.getId() : null;
+        String nombreCategoria = (categoria != null) ? categoria.getNombre() : null;
 
         return new ProductoDTO(
                 producto.getId(),
                 producto.getNombre(),
                 producto.getPrecio(),
                 categoriaId,
+                nombreCategoria,
                 producto.getStock(),
                 producto.getDescripcion(),
                 producto.getImagen()
