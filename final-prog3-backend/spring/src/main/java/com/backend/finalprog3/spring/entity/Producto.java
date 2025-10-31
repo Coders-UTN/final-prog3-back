@@ -18,7 +18,6 @@ public class Producto {
     double precio;
     private int stock;
 
-    @Lob
     private String descripcion;
     private String imagen;
 
