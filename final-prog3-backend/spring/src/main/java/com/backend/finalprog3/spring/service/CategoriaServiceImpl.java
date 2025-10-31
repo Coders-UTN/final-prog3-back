@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,8 +27,21 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Transactional
     public CategoriaDTO crearCategoria(CreateCategoriaDTO categoria) {
 
-        if (categoriaRepository.existsByNombreIgnoreCase(categoria.nombre())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"El nombre de la categoria ya existe");
+        Optional<Categoria> opcionalCategoria = categoriaRepository.findCategoriaByNombreIgnoreCase(categoria.nombre());
+
+        if (opcionalCategoria.isPresent()) {
+            Categoria categoriaEncontrada = opcionalCategoria.get();
+
+            if (categoriaEncontrada.isActivo()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de la categoria ya existe");
+            } else {
+                categoriaEncontrada.setDescripcion(categoria.descripcion());
+                categoriaEncontrada.setImagen(categoria.imagen());
+                categoriaEncontrada.setActivo(true);
+
+                Categoria categoriaGuardada = categoriaRepository.save(categoriaEncontrada);
+                return categoriaMapper.toDto(categoriaGuardada);
+            }
         }
 
         Categoria nuevaCategoria = categoriaMapper.toEntity(categoria);
