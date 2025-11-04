@@ -20,30 +20,25 @@ public class PedidoController {
     @Autowired
     private PedidoService pedidoService;
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<PedidoDTO> crearPedido(@RequestBody CreatePedidoDTO createPedidoDTO){
         return  ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.crearPedido(createPedidoDTO));
     }
 
     @GetMapping
     public ResponseEntity<List<PedidoDTO>> buscarPedidos(
-            // hacemos opcionales los parametros
             @RequestParam(required = false) Long usuarioId,
             @RequestParam(required = false) String estado
     ) {
 
         List<PedidoDTO> pedidos;
         if (usuarioId != null && estado != null) {
-            //  buscar por ambos
             pedidos = pedidoService.findAllByEstadoAndUsuarioId(estado, usuarioId);
         } else if (usuarioId != null) {
-            //  buscar solo por usuario
             pedidos = pedidoService.findAllByUsuarioId(usuarioId);
         } else if (estado != null) {
-            // buscar solo por estado
             pedidos = pedidoService.findAllByEstado(estado);
         } else {
-            // buscar todos
             pedidos = pedidoService.findAllPedidos();
         }
 
