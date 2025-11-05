@@ -50,23 +50,32 @@ public class PedidoServiceImpl implements PedidoService {
                     .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
 
             int stockDisponible = productoEncontrado.getStock();
-            if (stockDisponible < itemPedido.cantidad()) {
+            int cantidadPedida = itemPedido.cantidad();
+
+            if (stockDisponible < cantidadPedida) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente para realizar el pedido");
             }
 
             double precioUnitario = productoEncontrado.getPrecio();
-            double subtotal = precioUnitario * itemPedido.cantidad();
+            double subtotal = precioUnitario * cantidadPedida;
             total += subtotal;
 
             DetallePedido nuevoItem = DetallePedido.builder()
                     .producto(productoEncontrado)
                     .precioUnitario(precioUnitario)
-                    .cantidad(itemPedido.cantidad())
+                    .cantidad(cantidadPedida)
                     .subtotal(subtotal)
                     .build();
 
             nuevoPedido.agregarDetalle(nuevoItem);
-            productoEncontrado.setStock(stockDisponible - itemPedido.cantidad());
+
+            int nuevoStock = stockDisponible - cantidadPedida;
+            productoEncontrado.setStock(nuevoStock);
+
+            if (nuevoStock == 0) {
+                productoEncontrado.setActivo(false);
+            }
+
             productoRepository.save(productoEncontrado);
         }
 
@@ -130,6 +139,7 @@ public class PedidoServiceImpl implements PedidoService {
         Estado estadoEnum = convertirStringAEstado(estado);
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+
         pedido.setEstado(estadoEnum);
         return pedidoMapper.toDTO(pedidoRepository.save(pedido));
     }
@@ -148,6 +158,11 @@ public class PedidoServiceImpl implements PedidoService {
             Producto producto = detalle.getProducto();
             int cantidadDevuelta = detalle.getCantidad();
             producto.setStock(producto.getStock() + cantidadDevuelta);
+
+            if (producto.getStock() > 0) {
+                producto.setActivo(true);
+            }
+
             productoRepository.save(producto);
         }
 
