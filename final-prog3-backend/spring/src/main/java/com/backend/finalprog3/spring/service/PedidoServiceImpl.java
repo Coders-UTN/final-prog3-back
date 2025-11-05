@@ -11,6 +11,7 @@ import com.backend.finalprog3.spring.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -30,13 +31,12 @@ public class PedidoServiceImpl implements PedidoService {
     private PedidoRepository pedidoRepository;
 
     @Override
+    @Transactional
     public PedidoDTO crearPedido(CreatePedidoDTO createPedidoDTO) {
 
-        //buscarmos usuario en base de datos
         Usuario usuarioEncontrado = usuarioRepository.findById(createPedidoDTO.usuarioId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se encontro usuario con el id proporcionado"));
 
-        //creamos el nuevo pedido
         Pedido nuevoPedido = Pedido.builder()
                 .usuario(usuarioEncontrado)
                 .fecha(LocalDate.now())
@@ -44,18 +44,16 @@ public class PedidoServiceImpl implements PedidoService {
                 .build();
 
         double total = 0.0;
-        //iteramos sober los itempedido del DTO de creacion
         for (CreateDetallePedidoDTO itemPedido : createPedidoDTO.items()){
 
-            //si el producto no existe o no hay stock disponible lanzamos error
-            Producto productoEncontrado = productoRepository.findById(itemPedido.productoId())
+            Producto productoEncontrado = productoRepository.findByIdAndActivoTrue(itemPedido.productoId())
                     .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
 
             int stockDisponible = productoEncontrado.getStock();
             if (stockDisponible < itemPedido.cantidad()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente para realizar el pedido");
             }
-            //asignamos precio unitario, subtotal y sumamos al total general
+
             double precioUnitario = productoEncontrado.getPrecio();
             double subtotal = precioUnitario * itemPedido.cantidad();
             total += subtotal;
@@ -69,18 +67,18 @@ public class PedidoServiceImpl implements PedidoService {
 
             nuevoPedido.agregarDetalle(nuevoItem);
             productoEncontrado.setStock(stockDisponible - itemPedido.cantidad());
-            //actualizamos producto en base de datos
             productoRepository.save(productoEncontrado);
         }
-        //asignamos total, guardamos persistencia y devolvemos el DTO
+
         nuevoPedido.setTotal(total);
         Pedido pedidoGuardado = pedidoRepository.save(nuevoPedido);
         return pedidoMapper.toDTO(pedidoGuardado);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PedidoDTO> findAllPedidos(){
-        List<Pedido> listaPedidos = pedidoRepository.findAll();
+        List<Pedido> listaPedidos = pedidoRepository.findAllPedidosWithDetails();
 
         return listaPedidos.stream()
                 .map(pedidoMapper::toDTO)
@@ -88,24 +86,28 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PedidoDTO findById(long id) {
-        Pedido pedidoEncontrado = pedidoRepository.findById(id)
+        Pedido pedidoEncontrado = pedidoRepository.findByIdWithDetails(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
         return pedidoMapper.toDTO(pedidoEncontrado);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PedidoDTO> findAllByUsuarioId(long usuarioId) {
-        List<Pedido> listaPedidos = pedidoRepository.findAllByUsuarioId(usuarioId);
+        List<Pedido> listaPedidos = pedidoRepository.findAllByUsuarioIdWithDetails(usuarioId);
 
         return listaPedidos.stream()
                 .map(pedidoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public List<PedidoDTO> findAllByEstado(String estado) {
         Estado estadoEnum = convertirStringAEstado(estado);
-        List<Pedido> listaPedidos = pedidoRepository.findAllByEstado(estadoEnum);
+        List<Pedido> listaPedidos = pedidoRepository.findAllByEstadoWithDetails(estadoEnum);
 
         return listaPedidos.stream()
                 .map(pedidoMapper::toDTO)
@@ -113,15 +115,17 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PedidoDTO> findAllByEstadoAndUsuarioId(String estado, long usuarioId) {
         Estado estadoEnum = convertirStringAEstado(estado);
-        List<Pedido> listaPedidos = pedidoRepository.findAllByEstadoAndUsuarioId(estadoEnum, usuarioId);
+        List<Pedido> listaPedidos = pedidoRepository.findAllByEstadoAndUsuarioIdWithDetails(estadoEnum, usuarioId);
         return listaPedidos.stream()
                 .map(pedidoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public PedidoDTO modificarEstado(Long id, String estado) {
         Estado estadoEnum = convertirStringAEstado(estado);
         Pedido pedido = pedidoRepository.findById(id)
@@ -131,6 +135,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @Transactional
     public void cancelarPedido(Long id){
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
@@ -138,7 +143,7 @@ public class PedidoServiceImpl implements PedidoService {
         if (pedido.getEstado() != Estado.PENDIENTE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puede cancelarse un pedido finalizado");
         }
-        //devolver stock de productos que no van a utilizarse
+
         for (DetallePedido detalle : pedido.getDetallePedido()) {
             Producto producto = detalle.getProducto();
             int cantidadDevuelta = detalle.getCantidad();
@@ -146,7 +151,6 @@ public class PedidoServiceImpl implements PedidoService {
             productoRepository.save(producto);
         }
 
-        //setear pedido a cancelado y persistirlo
         pedido.setEstado(Estado.CANCELADO);
         pedidoRepository.save(pedido);
     }
