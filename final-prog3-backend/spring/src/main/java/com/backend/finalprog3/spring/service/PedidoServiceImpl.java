@@ -72,10 +72,6 @@ public class PedidoServiceImpl implements PedidoService {
             int nuevoStock = stockDisponible - cantidadPedida;
             productoEncontrado.setStock(nuevoStock);
 
-            if (nuevoStock == 0) {
-                productoEncontrado.setActivo(false);
-            }
-
             productoRepository.save(productoEncontrado);
         }
 
@@ -137,17 +133,29 @@ public class PedidoServiceImpl implements PedidoService {
     @Transactional
     public PedidoDTO modificarEstado(Long id, String estado) {
         Estado estadoEnum = convertirStringAEstado(estado);
-        Pedido pedido = pedidoRepository.findById(id)
+
+        Pedido pedido = pedidoRepository.findByIdWithDetails(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
 
         pedido.setEstado(estadoEnum);
+
+        if (estadoEnum == Estado.TERMINADO) {
+            for (DetallePedido detalle : pedido.getDetallePedido()) {
+                Producto producto = detalle.getProducto();
+                if (producto.getStock() == 0) {
+                    producto.setActivo(false);
+                    productoRepository.save(producto);
+                }
+            }
+        }
+
         return pedidoMapper.toDTO(pedidoRepository.save(pedido));
     }
 
     @Override
     @Transactional
     public void cancelarPedido(Long id){
-        Pedido pedido = pedidoRepository.findById(id)
+        Pedido pedido = pedidoRepository.findByIdWithDetails(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
 
         if (pedido.getEstado() != Estado.PENDIENTE) {
@@ -157,9 +165,11 @@ public class PedidoServiceImpl implements PedidoService {
         for (DetallePedido detalle : pedido.getDetallePedido()) {
             Producto producto = detalle.getProducto();
             int cantidadDevuelta = detalle.getCantidad();
-            producto.setStock(producto.getStock() + cantidadDevuelta);
+            int nuevoStock = producto.getStock() + cantidadDevuelta;
 
-            if (producto.getStock() > 0) {
+            producto.setStock(nuevoStock);
+
+            if (nuevoStock > 0) {
                 producto.setActivo(true);
             }
 
