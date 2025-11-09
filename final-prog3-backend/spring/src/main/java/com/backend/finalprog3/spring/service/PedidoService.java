@@ -14,5 +14,5 @@ public interface PedidoService {
     List<PedidoDTO> findAllByEstado(String estado);
     List<PedidoDTO> findAllByEstadoAndUsuarioId(String estado, long usuarioId);
     PedidoDTO modificarEstado(Long id, String estado);
-    void cancelarPedido(Long id);
+    PedidoDTO cancelarPedido(Long id);
 }
