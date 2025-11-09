@@ -165,7 +165,7 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido = pedidoRepository.findByIdWithDetails(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
 
-        if (pedido.getEstado() == Estado.PENDIENTE || pedido.getEstado() == Estado.CONFIRMADO) {
+        if (pedido.getEstado() == Estado.CANCELADO || pedido.getEstado() == Estado.TERMINADO) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puede cancelarse un pedido finalizado");
         }
 
