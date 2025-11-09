@@ -9,6 +9,7 @@ public interface ProductoService {
 
     ProductoDTO crearProducto(CreateProductoDTO createProductoDTO);
     List<ProductoDTO> findAllProductos();
+    List<ProductoDTO> findAllByCategoriaId(Long id);
     ProductoDTO findProductoById(Long id);
     ProductoDTO findProductoByName(String name);
     ProductoDTO modificarProducto(Long id, CreateProductoDTO updateDTO);

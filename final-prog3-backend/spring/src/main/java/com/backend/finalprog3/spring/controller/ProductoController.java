@@ -55,4 +55,9 @@ public class ProductoController {
         productoService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("productos/categoria/{id}")
+    public List<ProductoDTO> buscarProductoPorCategoria(@PathVariable Long id){
+        return productoService.findAllByCategoriaId(id);
+    }
 }

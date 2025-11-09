@@ -61,6 +61,13 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
+    public List<ProductoDTO> findAllByCategoriaId(Long id){
+        List<Producto> productos = productoRepository.findByCategoriaId(id);
+        return productos.stream().map(productoMapper::toDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
     public ProductoDTO modificarProducto(Long id, CreateProductoDTO updateDTO) {
         Producto producto = productoRepository.findByIdAndActivoTrue(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado o inactivo con id: " + id));
