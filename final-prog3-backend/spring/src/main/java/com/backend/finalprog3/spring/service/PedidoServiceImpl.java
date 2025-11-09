@@ -137,6 +137,13 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido = pedidoRepository.findByIdWithDetails(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
 
+        Estado estadoActual = pedido.getEstado();
+
+        if (estadoActual == Estado.TERMINADO || estadoActual == Estado.CANCELADO) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Este pedido ya se encuentra en un estado final y no puede ser modificado.");
+        }
+
         pedido.setEstado(estadoEnum);
 
         if (estadoEnum == Estado.TERMINADO) {
