@@ -5,4 +5,5 @@ import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
 
 public interface UsuarioService {
     UsuarioDTO crearUsuario(RegistroRequestDTO  registroRequestDTO);
+    UsuarioDTO buscarUsuarioPorId(Long id);
 }
