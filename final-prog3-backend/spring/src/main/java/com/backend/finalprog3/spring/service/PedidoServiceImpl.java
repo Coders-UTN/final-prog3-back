@@ -161,11 +161,11 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     @Transactional
-    public void cancelarPedido(Long id){
+    public PedidoDTO cancelarPedido(Long id){
         Pedido pedido = pedidoRepository.findByIdWithDetails(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
 
-        if (pedido.getEstado() != Estado.PENDIENTE) {
+        if (pedido.getEstado() == Estado.PENDIENTE || pedido.getEstado() == Estado.CONFIRMADO) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puede cancelarse un pedido finalizado");
         }
 
@@ -184,7 +184,8 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.setEstado(Estado.CANCELADO);
-        pedidoRepository.save(pedido);
+        Pedido pedidoGuardado = pedidoRepository.save(pedido);
+        return pedidoMapper.toDTO(pedidoGuardado);
     }
 
     private Estado convertirStringAEstado(String status) {
