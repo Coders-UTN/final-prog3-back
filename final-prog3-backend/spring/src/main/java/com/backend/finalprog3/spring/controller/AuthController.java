@@ -5,6 +5,7 @@ import com.backend.finalprog3.spring.dto.usuario.LoginRequestDTO;
 import com.backend.finalprog3.spring.dto.usuario.RegistroRequestDTO;
 import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
 import com.backend.finalprog3.spring.service.AuthService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,16 +22,18 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<UsuarioDTO> register(@RequestBody RegistroRequestDTO usuario) {
+    public ResponseEntity<UsuarioDTO> register(@RequestBody RegistroRequestDTO usuario, HttpSession session) {
 
         UsuarioDTO usuarioRegistrado = authService.register(usuario);
+        session.setAttribute("usuario_id", usuarioRegistrado.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRegistrado);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UsuarioDTO> login(@RequestBody LoginRequestDTO loginRequest) {
+    public ResponseEntity<UsuarioDTO> login(@RequestBody LoginRequestDTO loginRequest, HttpSession session) {
 
            UsuarioDTO loginEnUsuario = authService.login(loginRequest);
+           session.setAttribute("usuario_id", loginEnUsuario.id());
            return ResponseEntity.ok(loginEnUsuario);
     }
 }

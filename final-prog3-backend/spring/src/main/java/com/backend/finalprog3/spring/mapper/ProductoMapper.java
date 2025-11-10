@@ -4,22 +4,26 @@ import com.backend.finalprog3.spring.dto.producto.CreateProductoDTO;
 import com.backend.finalprog3.spring.dto.producto.ProductoDTO;
 import com.backend.finalprog3.spring.entity.Categoria;
 import com.backend.finalprog3.spring.entity.Producto;
-import com.backend.finalprog3.spring.repository.CategoriaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class ProductoMapper {
 
     public ProductoDTO toDTO(Producto producto) {
+        Categoria categoria = producto.getCategoria();
+
+        Long categoriaId = (categoria != null) ? categoria.getId() : null;
+        String nombreCategoria = (categoria != null) ? categoria.getNombre() : null;
+
         return new ProductoDTO(
                 producto.getId(),
                 producto.getNombre(),
                 producto.getPrecio(),
-                // Verificación segura
-                producto.getCategoria() != null ? producto.getCategoria().getNombre() : null
+                categoriaId,
+                nombreCategoria,
+                producto.getStock(),
+                producto.getDescripcion(),
+                producto.getImagen()
         );
     }
 
@@ -27,8 +31,10 @@ public class ProductoMapper {
         Producto nuevoProducto = Producto.builder()
                 .nombre(dto.nombre())
                 .precio(dto.precio())
+                .stock(dto.stock())
+                .descripcion(dto.descripcion())
+                .imagen(dto.imagen())
                 .build();
         return nuevoProducto;
     }
 }
-

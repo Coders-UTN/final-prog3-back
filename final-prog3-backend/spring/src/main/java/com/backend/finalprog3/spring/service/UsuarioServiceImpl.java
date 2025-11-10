@@ -37,4 +37,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         return usuarioMapper.toDto(usuarioNuevo);
     }
+
+    @Override
+    public UsuarioDTO buscarUsuarioPorId(Long id) {
+        Usuario usuarioEncontrado = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+        return usuarioMapper.toDto(usuarioEncontrado);
+    }
+
+
 }

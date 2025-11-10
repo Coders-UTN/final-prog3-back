@@ -16,9 +16,13 @@ public class Producto {
 
     String nombre;
     double precio;
+    private int stock;
+
+    private String descripcion;
+    private String imagen;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoria_id")
+    @JoinColumn(name = "categoria_id", nullable = false)
     @JsonBackReference
     Categoria categoria;
 

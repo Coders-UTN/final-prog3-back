@@ -25,8 +25,9 @@ public class Categoria {
     private String nombre;
 
     @OneToMany(mappedBy = "categoria",
-    fetch =FetchType.LAZY,
-    cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+            fetch =FetchType.LAZY,
+            cascade = {CascadeType.ALL},
+            orphanRemoval = true)
     @JsonManagedReference
     @Builder.Default
     private List<Producto> producto = new ArrayList<>();
@@ -34,6 +35,8 @@ public class Categoria {
     private String descripcion;
     private String imagen;
 
+    @Builder.Default
+    private boolean activo = true;
 
     public void agregarProducto(Producto producto){
         this.producto.add(producto);
@@ -44,5 +47,4 @@ public class Categoria {
         this.producto.remove(producto);
         producto.setCategoria(null);
     }
-
 }
