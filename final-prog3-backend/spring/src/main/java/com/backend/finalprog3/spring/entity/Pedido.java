@@ -35,6 +35,9 @@ public class Pedido {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
+    @Column(nullable = false)
+    private String direccionEnvio;
+
     @OneToMany(
             mappedBy = "pedido",
             cascade = CascadeType.ALL,

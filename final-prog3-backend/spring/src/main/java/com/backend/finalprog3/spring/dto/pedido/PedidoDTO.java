@@ -12,6 +12,7 @@ public record PedidoDTO(
         double total,
         List<DetallePedidoDTO> detallePedidoDTO,
         Long usuarioId,
-        String usuarioNombre
+        String usuarioNombre,
+        String direccionEnvio
 ) {
 }
