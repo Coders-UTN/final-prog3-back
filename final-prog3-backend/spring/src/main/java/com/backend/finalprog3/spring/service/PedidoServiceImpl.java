@@ -41,6 +41,7 @@ public class PedidoServiceImpl implements PedidoService {
                 .usuario(usuarioEncontrado)
                 .fecha(LocalDate.now())
                 .estado(Estado.PENDIENTE)
+                .direccionEnvio(createPedidoDTO.direccionEnvio())
                 .build();
 
         double total = 0.0;
@@ -167,6 +168,7 @@ public class PedidoServiceImpl implements PedidoService {
 
         if (pedido.getEstado() == Estado.CANCELADO || pedido.getEstado() == Estado.TERMINADO) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puede cancelarse un pedido finalizado");
+
         }
 
         for (DetallePedido detalle : pedido.getDetallePedido()) {

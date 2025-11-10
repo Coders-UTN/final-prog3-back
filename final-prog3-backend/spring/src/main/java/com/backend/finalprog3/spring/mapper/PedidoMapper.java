@@ -26,7 +26,8 @@ private DetallePedidoMapper detallePedidoMapper;
                 pedido.getTotal(),
                 detallePedidoDTO,
                 pedido.getUsuario().getId(),
-                pedido.getUsuario().getApellido() + ", " + pedido.getUsuario().getNombre()
+                pedido.getUsuario().getApellido() + ", " + pedido.getUsuario().getNombre(),
+                pedido.getDireccionEnvio()
         );
     }
 }
