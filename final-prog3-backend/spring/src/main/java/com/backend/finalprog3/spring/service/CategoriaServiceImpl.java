@@ -8,10 +8,8 @@ import com.backend.finalprog3.spring.exceptions.categoria.CategoriaNotFoundExcep
 import com.backend.finalprog3.spring.mapper.CategoriaMapper;
 import com.backend.finalprog3.spring.repository.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,9 +69,29 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     @Transactional
     public CategoriaDTO modificarCategoria(Long id, CreateCategoriaDTO categoriaDTO) {
+        // 1. Buscar la original
         Categoria categoria = categoriaRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new CategoriaNotFoundException("No se encontro una categoria con el id especificado"));
+                .orElseThrow(() -> new CategoriaNotFoundException("No se encontró una categoría con el id especificado"));
 
+        // 2. Buscar por nombre
+        Optional<Categoria> existente = categoriaRepository.findByNombreIgnoreCase(categoriaDTO.nombre());
+
+        if (existente.isPresent() && !existente.get().getId().equals(id)) {
+            Categoria duplicada = existente.get();
+
+            if (duplicada.isActivo()) {
+                throw new CategoriaAlreadyExistsException("El nombre de la categoría ya existe");
+            }
+
+            // Reactivar inactiva
+            duplicada.setDescripcion(categoriaDTO.descripcion());
+            duplicada.setImagen(categoriaDTO.imagen());
+            duplicada.setActivo(true);
+            categoriaRepository.save(duplicada);
+            return categoriaMapper.toDto(duplicada);
+        }
+
+        // 3. Si no hay conflictos, modificar la original
         categoria.setNombre(categoriaDTO.nombre());
         categoria.setDescripcion(categoriaDTO.descripcion());
         categoria.setImagen(categoriaDTO.imagen());
@@ -100,7 +118,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     @Transactional(readOnly = true)
     public CategoriaDTO findByNombreIgnoreCase(String nombre) {
-        Categoria categoria = categoriaRepository.findByNombreIgnoreCaseAndActivoTrue(nombre)
+        Categoria categoria = categoriaRepository.findByNombreIgnoreCase(nombre)
                 .orElseThrow(() -> new CategoriaNotFoundException("No se encontro la categoria"));
 
         return categoriaMapper.toDto(categoria);
