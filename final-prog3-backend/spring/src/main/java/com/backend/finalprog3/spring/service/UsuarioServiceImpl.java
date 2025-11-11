@@ -4,6 +4,8 @@ import com.backend.finalprog3.spring.dto.usuario.RegistroRequestDTO;
 import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
 import com.backend.finalprog3.spring.entity.Rol;
 import com.backend.finalprog3.spring.entity.Usuario;
+import com.backend.finalprog3.spring.exceptions.usuario.EmailAlreadyExistsException;
+import com.backend.finalprog3.spring.exceptions.usuario.UsuarioNotFoundException;
 import com.backend.finalprog3.spring.mapper.UsuarioMapper;
 import com.backend.finalprog3.spring.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioDTO crearUsuario(RegistroRequestDTO registroRequestDTO) {
 
         if (usuarioRepository.existsByEmail(registroRequestDTO.email())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El mail ingresado ya existe. Intente con otro");
+            throw new EmailAlreadyExistsException("El mail ingresado ya existe. Intente con otro");
         }
 
         Usuario usuarioNuevo = usuarioMapper.toEntity(registroRequestDTO);
@@ -41,7 +43,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioDTO buscarUsuarioPorId(Long id) {
         Usuario usuarioEncontrado = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
         return usuarioMapper.toDto(usuarioEncontrado);
     }
 

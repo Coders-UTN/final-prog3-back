@@ -3,6 +3,8 @@ package com.backend.finalprog3.spring.service;
 import com.backend.finalprog3.spring.dto.categoria.CategoriaDTO;
 import com.backend.finalprog3.spring.dto.categoria.CreateCategoriaDTO;
 import com.backend.finalprog3.spring.entity.Categoria;
+import com.backend.finalprog3.spring.exceptions.categoria.CategoriaAlreadyExistsException;
+import com.backend.finalprog3.spring.exceptions.categoria.CategoriaNotFoundException;
 import com.backend.finalprog3.spring.mapper.CategoriaMapper;
 import com.backend.finalprog3.spring.repository.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ public class CategoriaServiceImpl implements CategoriaService {
             Categoria categoriaEncontrada = opcionalCategoria.get();
 
             if (categoriaEncontrada.isActivo()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de la categoria ya existe");
+                throw new CategoriaAlreadyExistsException("El nombre de la categoria ya existe");
             } else {
                 categoriaEncontrada.setDescripcion(categoria.descripcion());
                 categoriaEncontrada.setImagen(categoria.imagen());
@@ -53,9 +55,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Transactional(readOnly = true)
     public CategoriaDTO findCategoriaById(Long id) {
         Categoria categoria = categoriaRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "No se encontro una categoria con el id especificado"));
+                .orElseThrow(() -> new CategoriaNotFoundException("No se encontro una categoria con el id especificado"));
 
         return categoriaMapper.toDto(categoria);
     }
@@ -72,9 +72,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Transactional
     public CategoriaDTO modificarCategoria(Long id, CreateCategoriaDTO categoriaDTO) {
         Categoria categoria = categoriaRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "No se encontro una categoria con el id especificado"));
+                .orElseThrow(() -> new CategoriaNotFoundException("No se encontro una categoria con el id especificado"));
 
         categoria.setNombre(categoriaDTO.nombre());
         categoria.setDescripcion(categoriaDTO.descripcion());
@@ -88,9 +86,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Transactional
     public void eliminarCategoria(Long id) {
         Categoria categoria = categoriaRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "No se encontro una categoria con el id especificado"));
+                .orElseThrow(() -> new CategoriaNotFoundException("No se encontro una categoria con el id especificado"));
 
         categoria.setActivo(false);
 
@@ -105,7 +101,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Transactional(readOnly = true)
     public CategoriaDTO findByNombreIgnoreCase(String nombre) {
         Categoria categoria = categoriaRepository.findByNombreIgnoreCaseAndActivoTrue(nombre)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se encontro la categoria"));
+                .orElseThrow(() -> new CategoriaNotFoundException("No se encontro la categoria"));
 
         return categoriaMapper.toDto(categoria);
     }

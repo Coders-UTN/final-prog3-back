@@ -5,6 +5,8 @@ import com.backend.finalprog3.spring.dto.producto.CreateProductoDTO;
 import com.backend.finalprog3.spring.dto.producto.ProductoDTO;
 import com.backend.finalprog3.spring.entity.Categoria;
 import com.backend.finalprog3.spring.entity.Producto;
+import com.backend.finalprog3.spring.exceptions.categoria.CategoriaNotFoundException;
+import com.backend.finalprog3.spring.exceptions.producto.ProductoNotFoundException;
 import com.backend.finalprog3.spring.mapper.ProductoMapper;
 import com.backend.finalprog3.spring.repository.CategoriaRepository;
 import com.backend.finalprog3.spring.repository.ProductoRepository;
@@ -28,7 +30,7 @@ public class ProductoServiceImpl implements ProductoService {
         Producto producto = productoMapper.toEntity(createDTO);
 
         Categoria categoria = categoriaRepository.findById(createDTO.categoriaid())
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + createDTO.categoriaid()));
+                .orElseThrow(() -> new CategoriaNotFoundException("Categoría no encontrada con id: " + createDTO.categoriaid()));
 
         producto.setCategoria(categoria);
 
@@ -47,7 +49,7 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional(readOnly = true)
     public ProductoDTO findProductoById(Long id) {
         Producto producto = productoRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado o inactivo con id: " + id));
+                .orElseThrow(() -> new ProductoNotFoundException("Producto no encontrado o inactivo con id: " + id));
         return productoMapper.toDTO(producto);
     }
 
@@ -55,7 +57,7 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional(readOnly = true)
     public ProductoDTO findProductoByName(String name) {
         Producto producto = productoRepository.findByNombreAndActivoTrue(name)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado o inactivo con nombre: " + name));
+                .orElseThrow(() -> new ProductoNotFoundException("Producto no encontrado o inactivo con nombre: " + name));
         return productoMapper.toDTO(producto);
     }
 
@@ -70,7 +72,7 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional
     public ProductoDTO modificarProducto(Long id, CreateProductoDTO updateDTO) {
         Producto producto = productoRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado o inactivo con id: " + id));
+                .orElseThrow(() -> new ProductoNotFoundException("Producto no encontrado o inactivo con id: " + id));
 
         producto.setNombre(updateDTO.nombre());
         producto.setPrecio(updateDTO.precio());
@@ -80,7 +82,7 @@ public class ProductoServiceImpl implements ProductoService {
 
         if (updateDTO.categoriaid() != null && !updateDTO.categoriaid().equals(producto.getCategoria().getId())) {
             Categoria nuevaCategoria = categoriaRepository.findById(updateDTO.categoriaid())
-                    .orElseThrow(() -> new RuntimeException("Nueva Categoría no encontrada con id: " + updateDTO.categoriaid()));
+                    .orElseThrow(() -> new CategoriaNotFoundException("Nueva Categoría no encontrada con id: " + updateDTO.categoriaid()));
             producto.setCategoria(nuevaCategoria);
         }
 
@@ -92,7 +94,7 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional
     public void eliminarProducto(Long id) {
         Producto producto = productoRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado o inactivo con id: " + id));
+                .orElseThrow(() -> new ProductoNotFoundException("Producto no encontrado o inactivo con id: " + id));
 
         producto.setActivo(false);
         productoRepository.save(producto);

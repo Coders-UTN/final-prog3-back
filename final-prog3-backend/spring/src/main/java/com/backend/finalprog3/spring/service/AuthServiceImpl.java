@@ -4,6 +4,8 @@ import com.backend.finalprog3.spring.dto.usuario.LoginRequestDTO;
 import com.backend.finalprog3.spring.dto.usuario.RegistroRequestDTO;
 import com.backend.finalprog3.spring.dto.usuario.UsuarioDTO;
 import com.backend.finalprog3.spring.entity.Usuario;
+import com.backend.finalprog3.spring.exceptions.usuario.EmailAlreadyExistsException;
+import com.backend.finalprog3.spring.exceptions.usuario.IncorrectPasswordException;
 import com.backend.finalprog3.spring.mapper.UsuarioMapper;
 import com.backend.finalprog3.spring.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +33,13 @@ public class AuthServiceImpl implements AuthService {
     public UsuarioDTO login(LoginRequestDTO usuarioLogin) {
 
         Usuario usuario = usuarioRepository.findByEmail(usuarioLogin.email()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email invalido"));
+                new EmailAlreadyExistsException("El email " + usuarioLogin.email() + " no se encuentra registrado."));
 
         //Se hashea la clave del login para poder compararlas:
         String contrasenaHasheada = Sha256Util.hash(usuarioLogin.password());
 
         if(!usuario.getContrasena().equals(contrasenaHasheada)){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Contraseña incorrecta");
+            throw new IncorrectPasswordException("Contraseña incorrecta");
         }
 
         return usuarioMapper.toDto(usuario);

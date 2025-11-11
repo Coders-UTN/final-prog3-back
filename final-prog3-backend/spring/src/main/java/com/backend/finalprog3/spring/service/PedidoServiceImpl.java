@@ -4,6 +4,12 @@ import com.backend.finalprog3.spring.dto.pedido.CreateDetallePedidoDTO;
 import com.backend.finalprog3.spring.dto.pedido.CreatePedidoDTO;
 import com.backend.finalprog3.spring.dto.pedido.PedidoDTO;
 import com.backend.finalprog3.spring.entity.*;
+import com.backend.finalprog3.spring.exceptions.pedido.EstadoNoValidoException;
+import com.backend.finalprog3.spring.exceptions.pedido.PedidoFinalStateException;
+import com.backend.finalprog3.spring.exceptions.pedido.PedidoNotFoundException;
+import com.backend.finalprog3.spring.exceptions.pedido.StockInsuficienteException;
+import com.backend.finalprog3.spring.exceptions.producto.ProductoNotFoundException;
+import com.backend.finalprog3.spring.exceptions.usuario.UsuarioNotFoundException;
 import com.backend.finalprog3.spring.mapper.PedidoMapper;
 import com.backend.finalprog3.spring.repository.PedidoRepository;
 import com.backend.finalprog3.spring.repository.ProductoRepository;
@@ -35,7 +41,7 @@ public class PedidoServiceImpl implements PedidoService {
     public PedidoDTO crearPedido(CreatePedidoDTO createPedidoDTO) {
 
         Usuario usuarioEncontrado = usuarioRepository.findById(createPedidoDTO.usuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se encontro usuario con el id proporcionado"));
+                .orElseThrow(() -> new UsuarioNotFoundException("No se encontro usuario con el id proporcionado"));
 
         Pedido nuevoPedido = Pedido.builder()
                 .usuario(usuarioEncontrado)
@@ -48,13 +54,13 @@ public class PedidoServiceImpl implements PedidoService {
         for (CreateDetallePedidoDTO itemPedido : createPedidoDTO.items()){
 
             Producto productoEncontrado = productoRepository.findByIdAndActivoTrue(itemPedido.productoId())
-                    .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
+                    .orElseThrow( () -> new ProductoNotFoundException("Producto no encontrado"));
 
             int stockDisponible = productoEncontrado.getStock();
             int cantidadPedida = itemPedido.cantidad();
 
             if (stockDisponible < cantidadPedida) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente para realizar el pedido");
+                throw new StockInsuficienteException("Stock insuficiente para realizar el pedido");
             }
 
             double precioUnitario = productoEncontrado.getPrecio();
@@ -95,7 +101,7 @@ public class PedidoServiceImpl implements PedidoService {
     @Transactional(readOnly = true)
     public PedidoDTO findById(long id) {
         Pedido pedidoEncontrado = pedidoRepository.findByIdWithDetails(id)
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+                .orElseThrow( () -> new PedidoNotFoundException("Pedido no encontrado"));
         return pedidoMapper.toDTO(pedidoEncontrado);
     }
 
@@ -136,13 +142,12 @@ public class PedidoServiceImpl implements PedidoService {
         Estado estadoEnum = convertirStringAEstado(estado);
 
         Pedido pedido = pedidoRepository.findByIdWithDetails(id)
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+                .orElseThrow( () -> new PedidoNotFoundException("Pedido no encontrado"));
 
         Estado estadoActual = pedido.getEstado();
 
         if (estadoActual == Estado.TERMINADO || estadoActual == Estado.CANCELADO) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Este pedido ya se encuentra en un estado final y no puede ser modificado.");
+            throw new PedidoFinalStateException("Este pedido ya se encuentra en un estado final y no puede ser modificado.");
         }
 
         pedido.setEstado(estadoEnum);
@@ -164,10 +169,10 @@ public class PedidoServiceImpl implements PedidoService {
     @Transactional
     public PedidoDTO cancelarPedido(Long id){
         Pedido pedido = pedidoRepository.findByIdWithDetails(id)
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+                .orElseThrow( () -> new PedidoNotFoundException("Pedido no encontrado"));
 
         if (pedido.getEstado() == Estado.CANCELADO || pedido.getEstado() == Estado.TERMINADO) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puede cancelarse un pedido finalizado");
+            throw new PedidoFinalStateException("No puede cancelarse un pedido finalizado");
 
         }
 
@@ -194,7 +199,7 @@ public class PedidoServiceImpl implements PedidoService {
         try {
             return Estado.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estado no válido: " + status);
+            throw new EstadoNoValidoException("Estado no válido: " + status);
         }
     }
 }
